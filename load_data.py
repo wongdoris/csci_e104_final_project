@@ -4,7 +4,7 @@ from create_data import creat_data, TestbedDataset
 from torch_geometric.loader import DataLoader
 
 
-def load_data(cellfile, datafile, testfile, batch_size=128):
+def load_data(cellfile, datafile, testfile, train_split=0.9, batch_size=128):
 
     creat_data(datafile, cellfile)
     creat_data(testfile, cellfile)
@@ -18,7 +18,6 @@ def load_data(cellfile, datafile, testfile, batch_size=128):
 
     # split train, validation and test data
     random_num = random.sample(range(0, data_size), data_size)
-    train_split = 0.9
     idx_train = random_num[0 : int(data_size * train_split)]
     idx_val = list(set(random_num) - set(idx_train))
 
@@ -52,9 +51,10 @@ def load_data(cellfile, datafile, testfile, batch_size=128):
         drug2_data_test, batch_size=TEST_BATCH_SIZE, shuffle=None
     )
 
-    print("Training set", len(drug1_data_train))
-    print("Validation set", len(drug1_data_val))
-    print("Testing set", len(drug1_data_test))
+    print("\nData loaded successfully.")
+    print("Training set size:", len(drug1_data_train))
+    print("Validation set size:", len(drug1_data_val))
+    print("Testing set size:", len(drug1_data_test))
 
     return (
         drug1_loader_train,
