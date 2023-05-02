@@ -109,7 +109,7 @@ def run(testfile, model_name, model_type):
 
     # write predictions to disk
     print("\nPredictions written to data/processed/predictions.json ")
-    with open("data/predictions", "w") as f:
+    with open("data/processed/predictions", "w") as f:
         f.write(j_pred)
 
 
