@@ -1,11 +1,10 @@
-import pandas as pd
-import numpy as np
 import csv
 import os
 import sys
 import networkx as nx
 import torch
-
+import pandas as pd
+import numpy as np
 from itertools import islice
 from rdkit import Chem
 from torch_geometric.data import InMemoryDataset
@@ -13,7 +12,7 @@ from torch_geometric import data as DATA
 
 
 def creat_data(datafile, cellfile):
-    file2 = cellfile
+    file2 = "data/" + cellfile + ".csv"
     cell_features = []
     with open(file2) as csvfile:
         csv_reader = csv.reader(csvfile)
@@ -67,7 +66,7 @@ def creat_data(datafile, cellfile):
         smile_graph=smile_graph,
     )
     print("Data created successfully")
-    print("preparing ", dsname + " in pytorch format!")
+    print("preparing ", datafile + " in pytorch format!")
 
 
 class TestbedDataset(InMemoryDataset):
