@@ -2,8 +2,8 @@ import argparse
 import pandas as pd
 import torch
 from torch_geometric.loader import DataLoader
-from create_data import TestbedDataset
-from train_pipeline import predicting
+from codes.create_data import TestbedDataset
+from codes.train_pipeline import predicting
 from models import gat, gcn, gin, sage
 
 cellfile = "independent_cell_features_954"

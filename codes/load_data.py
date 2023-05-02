@@ -1,6 +1,6 @@
 import torch
 import random
-from create_data import creat_data, TestbedDataset
+from codes.create_data import creat_data, TestbedDataset
 from torch_geometric.loader import DataLoader
 
 

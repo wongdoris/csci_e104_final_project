@@ -1,7 +1,9 @@
 import argparse
 import numpy as np
 import torch
-import utils, load_data, train_pipeline
+from codes.utils import plot_training_epoch, compute_preformence
+from codes.load_data import load_data
+from codes.train_pipeline import train_pipeline, predicting
 from models import gat, gcn, gin, sage
 
 cellfile = "independent_cell_features_954"
@@ -43,9 +45,7 @@ def run(model_name, model_type, nepoch):
         drug2_loader_val,
         drug1_loader_test,
         drug2_loader_test,
-    ) = load_data.load_data(
-        cellfile, datafile, testfile, train_split=0.9, batch_size=128
-    )
+    ) = load_data(cellfile, datafile, testfile, train_split=0.9, batch_size=128)
 
     # CPU or GPU
     if torch.cuda.is_available():
@@ -72,7 +72,7 @@ def run(model_name, model_type, nepoch):
     print(f"\nNumber of trainable parameterss: {params}\n")
 
     print("Start training model...")
-    info_train, info_val = train_pipeline.train_pipeline(
+    info_train, info_val = train_pipeline(
         model=model,
         optimizer=torch.optim.Adam(model.parameters(), lr=0.0005),
         loss_fn=torch.nn.CrossEntropyLoss(),
@@ -89,17 +89,15 @@ def run(model_name, model_type, nepoch):
     torch.save(model.state_dict(), path)
 
     # performance on testing data
-    T, S, Y = train_pipeline.predicting(
-        model, device, drug1_loader_test, drug2_loader_test
-    )
-    perf_test = utils.compute_preformence(T, S, Y)
+    T, S, Y = predicting(model, device, drug1_loader_test, drug2_loader_test)
+    perf_test = compute_preformence(T, S, Y)
 
     print("\nPerformance on Test data: ")
     for k, v in perf_test.items():
         print("{} = {:.4f}".format(k, v))
 
     # plot training epochs
-    utils.plot_training_epoch(info_train, info_val)
+    plot_training_epoch(info_train, info_val)
 
 
 if __name__ == "__main__":
