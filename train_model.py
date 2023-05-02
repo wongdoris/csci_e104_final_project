@@ -22,7 +22,7 @@ def main():
     )
 
     parser.add_argument(
-        "-nepoch", "--nepoch", type=int, default=5, help="Number of epoch to train"
+        "-epoch", "--epoch", type=int, default=5, help="Number of epoch to train"
     )
     parser.add_argument(
         "-name", "--name", type=str, default="model1", help="Model Name"
@@ -30,7 +30,7 @@ def main():
 
     args = parser.parse_args()
 
-    run(model_name=args.name, model_type=args.model, nepoch=args.nepoch)
+    run(model_name=args.name, model_type=args.model, nepoch=args.epoch)
 
 
 def run(model_name, model_type, nepoch):
@@ -96,7 +96,7 @@ def run(model_name, model_type, nepoch):
 
     print("\nPerformance on Test data: ")
     for k, v in perf_test.items():
-        print("{} = {:.4f}".foramat(k, v))
+        print("{} = {:.4f}".format(k, v))
 
     # plot training epochs
     utils.plot_training_epoch(info_train, info_val)
