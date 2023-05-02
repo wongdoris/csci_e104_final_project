@@ -1,6 +1,7 @@
+import argparse
 import numpy as np
 import torch
-import utils, load_data, train
+import utils, load_data, train_pipeline
 from models import gat, gcn, gin, sage
 
 cellfile = "independent_cell_features_954"
@@ -8,7 +9,31 @@ datafile = "new_labels_0_10"
 testfile = "independent_input"
 
 
-def main(model_name="gin_model1", model_type="gin", nepoch=3):
+def main():
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "-model",
+        "--model",
+        type=str,
+        default="gcn",
+        help="Type of model to train, options: gcn, gat, gin, sage",
+    )
+
+    parser.add_argument(
+        "-nepoch", "--nepoch", type=int, default=5, help="Number of epoch to train"
+    )
+    parser.add_argument(
+        "-name", "--name", type=str, default="model1", help="Model Name"
+    )
+
+    args = parser.parse_args()
+
+    run(model_name=args.name, model_type=args.model, nepoch=args.nepoch)
+
+
+def run(model_name, model_type, nepoch):
 
     # load train, test data
     (
@@ -31,7 +56,7 @@ def main(model_name="gin_model1", model_type="gin", nepoch=3):
         print("\nThe code uses CPU!!!")
 
     # create model
-    print(f"\nCreating {model_type.upper()} model:")
+    print("\nCreating {} model".format(model_type.upper()))
     if model_type == "gat":
         model = gat.GATNet().to(device)
     elif model_type == "gcn":
@@ -47,7 +72,7 @@ def main(model_name="gin_model1", model_type="gin", nepoch=3):
     print(f"\nNumber of trainable parameterss: {params}\n")
 
     print("Start training model...")
-    info_train, info_val = train.train_pipeline(
+    info_train, info_val = train_pipeline.train_pipeline(
         model=model,
         optimizer=torch.optim.Adam(model.parameters(), lr=0.0005),
         loss_fn=torch.nn.CrossEntropyLoss(),
@@ -60,16 +85,18 @@ def main(model_name="gin_model1", model_type="gin", nepoch=3):
 
     # save trained model
     path = "trained_model/" + model_name
-    print(f"Saving trained model to {path}")
+    print("Saving trained model to {}".format(path))
     torch.save(model.state_dict(), path)
 
     # performance on testing data
-    T, S, Y = train.predicting(model, device, drug1_loader_test, drug2_loader_test)
+    T, S, Y = train_pipeline.predicting(
+        model, device, drug1_loader_test, drug2_loader_test
+    )
     perf_test = utils.compute_preformence(T, S, Y)
 
     print("\nPerformance on Test data: ")
     for k, v in perf_test.items():
-        print(f"{k} = {v:.4f}")
+        print("{} = {:.4f}".foramat(k, v))
 
     # plot training epochs
     utils.plot_training_epoch(info_train, info_val)
