@@ -1,19 +1,30 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import Sequential, Linear, ReLU
 from torch_geometric.nn import SAGEConv
 from torch_geometric.nn import global_max_pool as gmp
 
+
 class SAGENet(torch.nn.Module):
-    def __init__(self, n_output=2, n_filters=32, embed_dim=128,num_features_xd=78, num_features_xt=954, output_dim=128, dropout=0.2):
+    def __init__(
+        self,
+        n_output=2,
+        n_filters=32,
+        embed_dim=128,
+        num_features_xd=78,
+        num_features_xt=954,
+        output_dim=128,
+        dropout=0.2,
+    ):
 
         super(SAGENet, self).__init__()
 
         # graph drug layers
-        self.drug_conv1 = SAGEConv(num_features_xd, num_features_xd*2)
-        self.drug_conv2 = SAGEConv(num_features_xd*2, num_features_xd*4)
-        self.drug_fc_g1 = torch.nn.Linear(num_features_xd*4, num_features_xd*2)
-        self.drug_fc_g2 = torch.nn.Linear(num_features_xd*2, output_dim)
+        self.drug_conv1 = SAGEConv(num_features_xd, num_features_xd * 2)
+        self.drug_conv2 = SAGEConv(num_features_xd * 2, num_features_xd * 4)
+        self.drug_fc_g1 = torch.nn.Linear(num_features_xd * 4, num_features_xd * 2)
+        self.drug_fc_g2 = torch.nn.Linear(num_features_xd * 2, output_dim)
 
         # DL cell featrues
         self.reduction = nn.Sequential(
@@ -24,7 +35,7 @@ class SAGENet(torch.nn.Module):
             nn.ReLU(),
             nn.Dropout(dropout),
             nn.Linear(512, output_dim * 2),
-            nn.ReLU()
+            nn.ReLU(),
         )
 
         # combined layers
@@ -39,7 +50,12 @@ class SAGENet(torch.nn.Module):
         self.output_dim = output_dim
 
     def forward(self, data1, data2):
-        x1, edge_index1, batch1, cell = data1.x, data1.edge_index, data1.batch, data1.cell
+        x1, edge_index1, batch1, cell = (
+            data1.x,
+            data1.edge_index,
+            data1.batch,
+            data1.cell,
+        )
         x2, edge_index2, batch2 = data2.x, data2.edge_index, data2.batch
 
         # deal drug1
@@ -49,7 +65,7 @@ class SAGENet(torch.nn.Module):
         x1 = self.relu(x1)
         # x1 = self.drug_conv3(x1, edge_index1)
         # x1 = self.relu(x1)
-        x1 = gmp(x1, batch1)       # global max pooling
+        x1 = gmp(x1, batch1)  # global max pooling
 
         # flatten
         x1 = self.relu(self.drug_fc_g1(x1))

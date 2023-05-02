@@ -5,20 +5,12 @@ from torch_geometric.loader import DataLoader
 
 
 def load_data(cellfile, datafile, testfile, batch_size=128):
-    
+
     creat_data(datafile, cellfile)
     creat_data(testfile, cellfile)
 
     TRAIN_BATCH_SIZE = batch_size
     TEST_BATCH_SIZE = batch_size
-
-    # CPU or GPU
-    if torch.cuda.is_available():
-        device = torch.device("cuda")
-        print("The code uses GPU...")
-    else:
-        device = torch.device("cpu")
-        print("The code uses CPU!!!")
 
     drug1_data = TestbedDataset(root="data", dataset=datafile + "_drug1")
     drug2_data = TestbedDataset(root="data", dataset=datafile + "_drug2")
@@ -54,10 +46,10 @@ def load_data(cellfile, datafile, testfile, batch_size=128):
     drug1_data_test = TestbedDataset(root="data", dataset=testfile + "_drug1")
     drug2_data_test = TestbedDataset(root="data", dataset=testfile + "_drug2")
     drug1_loader_test = DataLoader(
-        drug1_data_test, batch_size=TRAIN_BATCH_SIZE, shuffle=None
+        drug1_data_test, batch_size=TEST_BATCH_SIZE, shuffle=None
     )
     drug2_loader_test = DataLoader(
-        drug2_data_test, batch_size=TRAIN_BATCH_SIZE, shuffle=None
+        drug2_data_test, batch_size=TEST_BATCH_SIZE, shuffle=None
     )
 
     print("Training set", len(drug1_data_train))
@@ -66,9 +58,9 @@ def load_data(cellfile, datafile, testfile, batch_size=128):
 
     return (
         drug1_loader_train,
-        drug2_data_train,
-        drug1_data_val,
-        drug2_data_val,
-        drug1_data_test,
-        drug2_data_test,
+        drug2_loader_train,
+        drug1_loader_val,
+        drug2_loader_val,
+        drug1_loader_test,
+        drug2_loader_test,
     )

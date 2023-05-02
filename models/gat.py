@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import Sequential, Linear, ReLU
@@ -6,7 +7,15 @@ from torch_geometric.nn import global_max_pool as gmp
 
 # GAT model
 class GATNet(torch.nn.Module):
-    def __init__(self, num_features_xd=78, n_output=2, num_features_xt=954, output_dim=128, dropout=0.2, file=None):
+    def __init__(
+        self,
+        num_features_xd=78,
+        n_output=2,
+        num_features_xt=954,
+        output_dim=128,
+        dropout=0.2,
+        file=None,
+    ):
         super(GATNet, self).__init__()
 
         # graph drug layers
@@ -24,7 +33,7 @@ class GATNet(torch.nn.Module):
             nn.ReLU(),
             nn.Dropout(dropout),
             nn.Linear(512, output_dim * 2),
-            nn.ReLU()
+            nn.ReLU(),
         )
 
         # combined layers
@@ -39,7 +48,12 @@ class GATNet(torch.nn.Module):
         self.output_dim = output_dim
 
     def forward(self, data1, data2):
-        x1, edge_index1, batch1, cell = data1.x, data1.edge_index, data1.batch, data1.cell
+        x1, edge_index1, batch1, cell = (
+            data1.x,
+            data1.edge_index,
+            data1.batch,
+            data1.cell,
+        )
 
         x2, edge_index2, batch2 = data2.x, data2.edge_index, data2.batch
 
@@ -50,7 +64,7 @@ class GATNet(torch.nn.Module):
         x1 = self.drug_gat2(x1, edge_index1)
         x1 = F.elu(x1)
         x1 = F.dropout(x1, p=0.2, training=self.training)
-        x1 = gmp(x1, batch1)         # global max pooling
+        x1 = gmp(x1, batch1)  # global max pooling
         x1 = self.drug_fc_g1(x1)
         x1 = self.relu(x1)
 
