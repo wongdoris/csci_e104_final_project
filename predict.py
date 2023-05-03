@@ -1,6 +1,7 @@
 import argparse
 import pandas as pd
 import torch
+import sys
 from torch_geometric.loader import DataLoader
 from codes.create_data import TestbedDataset
 from codes.train_pipeline import predicting
@@ -70,7 +71,11 @@ def run(testfile, model_name, model_type):
         model = sage.SAGENet().to(device)
 
     path = "trained_model/" + model_name
-    model.load_state_dict(torch.load(path))
+    try:
+        model.load_state_dict(torch.load(path))
+    except:
+        print("Wrong model type!")
+        sys.exit()
 
     y_true, prob, y_pred = predicting(
         model, device, drug1_loader_test, drug2_loader_test
@@ -78,39 +83,42 @@ def run(testfile, model_name, model_type):
 
     print("\nModel predictions: ")
     for i, row in df_test.iterrows():
-        try:
-            print(
-                "{} drug1: {}, drug2: {}, cell: {}, True label: {} | Prediction: {:.0f} (score={:.3f})".format(
-                    i + 1,
-                    row.cell,
-                    smile_to_drug[row.drug1],
-                    smile_to_drug[row.drug2],
-                    row.label,
-                    y_pred[i],
-                    prob[i],
-                )
+        print(
+            "{} drug1: {}, drug2: {}, cell: {}, True label: {} | Prediction: {:.0f} (score={:.3f})".format(
+                i + 1,
+                row.cell,
+                smile_to_drug[row.drug1],
+                smile_to_drug[row.drug2],
+                row.label,
+                y_pred[i],
+                prob[i],
             )
-        except:
-            print(
-                "{} drug1: {}, drug2: {}, cell: {} | Prediction: {:.0f} (score={:.3f})".format(
-                    i + 1,
-                    row.cell,
-                    smile_to_drug[row.drug1],
-                    smile_to_drug[row.drug2],
-                    y_pred[i],
-                    prob[i],
-                )
-            )
+        )
 
     df_pred = df_test.copy()
     df_pred["prediction"] = y_pred
     df_pred["probability"] = prob
     j_pred = df_pred.to_json(orient="records")
 
+    n_ones_true = len(df_pred[df_pred.label == 1])
+    n_ones_pred = len(df_pred[df_pred.prediction == 1])
+    ncorrect = df_pred[df_pred.prediction == df_pred.label].prediction.count()
+    print("\nNumber of 1s: True={}, Predicted={}".format(n_ones_true, n_ones_pred))
+    print(
+        "Number of 0s: True={}, Predicted={}".format(
+            len(df_pred) - n_ones_true, len(df_pred) - n_ones_pred
+        )
+    )
+    print(
+        "\Correct predictions: {}/{} = {:.2%}".format(
+            ncorrect, len(df_pred), ncorrect / len(df_pred)
+        )
+    )
+
     # write predictions to disk
-    print("\nPredictions written to data/processed/predictions.json ")
     with open("data/processed/predictions", "w") as f:
         f.write(j_pred)
+    print("\nPredictions written to data/processed/predictions.json \n")
 
 
 if __name__ == "__main__":
