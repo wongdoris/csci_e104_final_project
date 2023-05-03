@@ -1,4 +1,3 @@
-import torch
 import random
 from codes.create_data import creat_data, TestbedDataset
 from torch_geometric.loader import DataLoader
