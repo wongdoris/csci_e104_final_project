@@ -102,7 +102,7 @@ def run(model_name, model_type, nepoch):
         print("{} = {:.4f}".format(k, v))
 
     # plot training epochs
-    plot_training_epoch(info_train, info_val)
+    plot_training_epoch(info_train, info_val, model_name)
 
 
 if __name__ == "__main__":

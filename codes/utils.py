@@ -1,3 +1,4 @@
+import os
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import (
     cohen_kappa_score,
@@ -25,7 +26,7 @@ def compute_preformence(T, S, Y):
     return perf
 
 
-def plot_training_epoch(train_info, val_info):
+def plot_training_epoch(train_info, val_info, file):
 
     # Plot train/validation loss and AUC
     epochs = range(1, len(train_info["loss"]) + 1)
@@ -51,5 +52,10 @@ def plot_training_epoch(train_info, val_info):
     ax[2].set_xlabel("Epochs")
     ax[2].set_ylabel("AUC")
     ax[2].legend()
-    plt.show()
+
+    if not os.path.exists("trained_model/plots"):
+        os.makedirs("trained_model/plots")
+
+    plt.savefig("trained_model/plots/" + file + ".png")
+    plt.close()
 
