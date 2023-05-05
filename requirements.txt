@@ -1,7 +1,5 @@
-python=3.8.8
 networkx>=3.0
 pytorch>=1.13.1
-rdkit-pypi>=2022.9.5
+rdkit>=2022.9.5
 scipy>=1.10.1
 torch-geometric>=2.3.0
-torchvision>=0.14.1
