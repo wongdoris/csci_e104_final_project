@@ -1,3 +1,4 @@
+import os
 import argparse
 import numpy as np
 import torch
@@ -84,6 +85,10 @@ def run(model_name, model_type, nepoch):
     print("Training complete.")
 
     # save trained model
+
+    if not os.path.exists("trained_model"):
+        os.makedirs("trained_model")
+
     path = "trained_model/" + model_name
     print("Saving trained model to {}".format(path))
     torch.save(model.state_dict(), path)
