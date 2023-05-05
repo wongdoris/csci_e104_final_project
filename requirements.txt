@@ -1,5 +1,4 @@
-networkx>=3.0
-pytorch>=1.13.1
-rdkit>=2022.9.5
-scipy>=1.10.1
-torch-geometric>=2.3.0
+torch==1.13.1
+torch-geometric==2.3.0
+networkx
+rdkit
